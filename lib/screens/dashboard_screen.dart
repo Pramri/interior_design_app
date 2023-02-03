@@ -5,7 +5,7 @@ import '../widgets/new_transaction.dart';
 import '../widgets/transaction_list.dart';
 import '../widgets/chart.dart';
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();

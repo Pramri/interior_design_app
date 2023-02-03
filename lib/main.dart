@@ -2,6 +2,7 @@ import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:interior_design_app/screens/subtab_screen.dart';
 import './screens/tabs_screen.dart';
 import './widgets/new_transaction.dart';
 import './model/transaction.dart';

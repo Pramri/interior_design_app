@@ -4,13 +4,11 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 
 class CustomerTable extends StatelessWidget {
-  const CustomerTable({super.key});
+  
 
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: DataTable(
+
+  DataTable tableData(){
+    return DataTable(
         columns: const <DataColumn>[
           DataColumn(
             label: Expanded(
@@ -39,7 +37,7 @@ class CustomerTable extends StatelessWidget {
           DataColumn(
             label: Expanded(
               child: Text(
-                'Phone No',
+                'Phone',
                 style: TextStyle(fontStyle: FontStyle.normal),
               ),
             ),
@@ -87,7 +85,13 @@ class CustomerTable extends StatelessWidget {
             ],
           ),
         ],
-      ),
+      );
+  }
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: tableData(),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:interior_design_app/screens/subtab_screen.dart';
 import '../widgets/main_drawer.dart';
 import './customers_screen.dart';
 import './vendors_screen.dart';
@@ -6,7 +7,7 @@ import './dashboard_screen.dart';
 import './account_screen.dart';
 
 class TabsScreen extends StatefulWidget {
-  const TabsScreen({super.key});
+ 
 
   @override
   State<TabsScreen> createState() => _TabsScreenState();
@@ -18,7 +19,7 @@ class _TabsScreenState extends State<TabsScreen> {
     {'page': DashboardScreen(), 'title':'Dashboard'},
     {'page': CustomersScreen(), 'title':'Customers'},
     {'page': VendorsScreen(), 'title':'Vendors'},
-    {'page': AccountScreen(), 'title':'Account'},
+    {'page': SubTabScreen(), 'title':'Account'},
   ];
 
   int _selectedPageIndex = 0;
@@ -31,7 +32,6 @@ class _TabsScreenState extends State<TabsScreen> {
   }
   @override
   Widget build(BuildContext context) {
-    //Used for bottom tabs.. so wrap Scaffold to DefaultTabcontroller
     return Scaffold(
       appBar: AppBar(
         title: Text(_pages[_selectedPageIndex]['title'].toString()),

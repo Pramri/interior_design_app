@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import '../model/quotationdata.dart';
-import './customer_screen/additemform_screen.dart';
+import './additemform_screen.dart';
+class QuotationScreen extends StatefulWidget {
+  const QuotationScreen({Key? key}) : super(key: key);
 
-class CustomersScreen extends StatefulWidget {
   @override
-  State<CustomersScreen> createState() => _CustomersScreenState();
+  State<QuotationScreen> createState() => _QuotationScreenState();
 }
 
-class _CustomersScreenState extends State<CustomersScreen> {
-  List<DataRow> rows = [
+class _QuotationScreenState extends State<QuotationScreen> {
+ List<DataRow> rows = [
     DataRow(cells: [
       DataCell(Text('item1')),
       DataCell(Text('20')),

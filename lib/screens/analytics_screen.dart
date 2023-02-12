@@ -4,16 +4,16 @@ import 'package:flutter/material.dart';
 // import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class VendorsScreen extends StatefulWidget {
+class AnalyticsScreen extends StatefulWidget {
   @override
-  _VendorsScreenState createState() => _VendorsScreenState();
+  _AnalyticsScreenState createState() => _AnalyticsScreenState();
 }
 
-class _VendorsScreenState extends State<VendorsScreen> {
+class _AnalyticsScreenState extends State<AnalyticsScreen> {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text("Vendor"),
+      child: Text("Analytics"),
     );
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:interior_design_app/screens/subtab_screen.dart';
 import '../widgets/main_drawer.dart';
 import './customers_screen.dart';
-import './vendors_screen.dart';
+import 'analytics_screen.dart';
 import './dashboard_screen.dart';
 import './account_screen.dart';
 
@@ -18,7 +18,7 @@ class _TabsScreenState extends State<TabsScreen> {
   final List<Map<String, Object>> _pages = [
     {'page': DashboardScreen(), 'title':'Dashboard'},
     {'page': CustomersScreen(), 'title':'Customers'},
-    {'page': VendorsScreen(), 'title':'Vendors'},
+    {'page': AnalyticsScreen(), 'title':'Analytics'},
     {'page': SubTabScreen(), 'title':'Account'},
   ];
 
@@ -61,8 +61,8 @@ class _TabsScreenState extends State<TabsScreen> {
           ),
           BottomNavigationBarItem(
             // backgroundColor: Theme.of(context).primaryColor,
-            icon: Icon(Icons.group),
-            label: 'Vendors',
+            icon: Icon(Icons.analytics),
+            label: 'Analytics',
           ),
            BottomNavigationBarItem(
              //backgroundColor: Theme.of(context).primaryColor,

@@ -1,5 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import './additemform_screen.dart';
+import 'dart:typed_data';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pdfWidgets;
+
 class QuotationScreen extends StatefulWidget {
   const QuotationScreen({Key? key}) : super(key: key);
 
@@ -60,6 +66,9 @@ class _QuotationScreenState extends State<QuotationScreen> {
 
   bool _isAddFormVisible = false;
 
+
+
+
   void _addItem() {
     Navigator.push(
       context,
@@ -79,13 +88,15 @@ class _QuotationScreenState extends State<QuotationScreen> {
                   IconButton(
                     icon: Icon(Icons.edit),
                     onPressed: () {
-                      // Handle edit action
+                     print("here is the logic for edit button");
                     },
                   ),
                   IconButton(
                     icon: Icon(Icons.delete),
                     onPressed: () {
-                      // Handle delete action
+                      setState(() {
+                      rows.removeAt(1);
+              });
                     },
                   ),
                 ],
@@ -116,4 +127,31 @@ class _QuotationScreenState extends State<QuotationScreen> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
+
+
+  void generatePDF(List<DataRow> rows) async {
+  final pdf = pdfWidgets.Document();
+
+  pdf.addPage(
+    pdfWidgets.MultiPage(
+      build: (context) => [
+        pdfWidgets.Table.fromTextArray(
+          context: context,
+          data: <List<String>>[
+            <String>['Item', 'Price/Sft', 'Total Price'],
+            ...rows.map((row) => [
+              row.cells[0].child.toString(),
+              row.cells[1].child.toString(),
+              row.cells[2].child.toString(),
+            ]),
+          ],
+        ),
+      ],
+    ),
+  );
+
+final file = File('quotation.pdf');
+Uint8List pdfBytes = await pdf.save();
+await file.writeAsBytes(pdfBytes);
+}
 }

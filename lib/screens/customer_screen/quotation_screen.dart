@@ -16,6 +16,14 @@ class QuotationScreen extends StatefulWidget {
 }
 
 class _QuotationScreenState extends State<QuotationScreen> {
+  int _selectedPageIndex = 0;
+
+  void _selectPage(int index) {
+    setState(() {
+      _selectedPageIndex = index;
+    });
+  }
+
   //Below code is to display the dialog before completing
   Future<bool> _showDeleteConfirmationDialog() async {
     final confirmed = await showDialog<bool>(
@@ -46,69 +54,27 @@ class _QuotationScreenState extends State<QuotationScreen> {
     return confirmed ?? false;
   }
 
-  List<DataRow> rows = [
-    DataRow(cells: [
-      DataCell(Text('item1')),
-      DataCell(Text('20')),
-      DataCell(Text('200')),
-      DataCell(Row(
-        children: [
-          IconButton(
-            icon: Icon(Icons.edit),
-            onPressed: () {
-              // Handle edit action
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.delete),
-            onPressed: () {
-              // Handle delete action
-            },
-          ),
-        ],
-      )),
-    ]),
-    DataRow(cells: [
-      DataCell(Text('item2')),
-      DataCell(Text('20')),
-      DataCell(Text('200')),
-      DataCell(Row(
-        children: [
-          IconButton(
-            icon: Icon(Icons.edit),
-            onPressed: () {
-              // Handle edit action
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.delete),
-            onPressed: () {
-              // Handle delete action
-            },
-          ),
-        ],
-      )),
-    ]),
-  ];
+  List<DataRow> rows = [];
 
-void _removeEntry(DataRow selectedData) {
-  int index = rows.indexOf(selectedData);
-  setState(() {
-    rows.removeAt(index);
-  });
-}
-
-void _deleteEntry(DataRow selectedData) async {
-  final confirmed = await _showDeleteConfirmationDialog();
-  if (confirmed) {
+  void _removeEntry(DataRow selectedData) {
     int index = rows.indexOf(selectedData);
     setState(() {
       rows.removeAt(index);
     });
   }
-}
+
+  void _deleteEntry(DataRow selectedData) async {
+    final confirmed = await _showDeleteConfirmationDialog();
+    if (confirmed) {
+      int index = rows.indexOf(selectedData);
+      setState(() {
+        rows.removeAt(index);
+      });
+    }
+  }
 
   void _addItem() {
+    DataRow? dataRow; // Declare the variable as nullable.
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -117,33 +83,38 @@ void _deleteEntry(DataRow selectedData) async {
     ).then((newItem) {
       if (newItem != null) {
         setState(() {
-          rows.add(
-            DataRow(cells: [
-              DataCell(Text(newItem['item'])),
-              DataCell(Text(newItem['pricePerSft'])),
-              DataCell(Text(newItem['totalPrice'])),
-              DataCell(Row(
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.edit),
-                    onPressed: () {
-                      print("here is the logic for edit button");
-                    },
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () async {
-                      final confirmed = await _showDeleteConfirmationDialog();
-                      print("New item value"+newItem);
-                      if (confirmed) {
-                        rows.removeAt(newItem);
-                      }
-                    },
-                  ),
-                ],
-              )),
-            ]),
-          );
+          dataRow = DataRow(cells: [
+            DataCell(Text(newItem['item'])),
+            DataCell(Text(newItem['pricePerSft'])),
+            DataCell(Text(newItem['totalPrice'])),
+            DataCell(Row(
+              children: [
+                IconButton(
+                  icon: Icon(Icons.edit),
+                  onPressed: () {
+                    print("here is the logic for edit button");
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () async {
+                    final confirmed = await _showDeleteConfirmationDialog();
+                    if (confirmed && dataRow != null) {
+                      // Check if dataRow is not null.
+                      setState(() {
+                        rows.remove(dataRow);
+                      });
+                    }
+                  },
+                ),
+              ],
+            )),
+          ]);
+          if (dataRow != null) {
+            // Check if dataRow is not null.
+
+            rows.add(dataRow!);
+          }
         });
       }
     });

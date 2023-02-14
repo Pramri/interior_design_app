@@ -5,6 +5,8 @@ import './additemform_screen.dart';
 import 'dart:typed_data';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pdfWidgets;
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf_viewer_plugin/pdf_viewer_plugin.dart';
 
 class QuotationScreen extends StatefulWidget {
   const QuotationScreen({Key? key}) : super(key: key);
@@ -14,7 +16,37 @@ class QuotationScreen extends StatefulWidget {
 }
 
 class _QuotationScreenState extends State<QuotationScreen> {
- List<DataRow> rows = [
+  //Below code is to display the dialog before completing
+  Future<bool> _showDeleteConfirmationDialog() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Confirmation'),
+          content: Text('Are you sure you want to delete this entry?'),
+          actions: <Widget>[
+            ElevatedButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+            ),
+            ElevatedButton(
+              child: Text('Delete'),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    return confirmed ?? false;
+  }
+
+  List<DataRow> rows = [
     DataRow(cells: [
       DataCell(Text('item1')),
       DataCell(Text('20')),
@@ -59,15 +91,22 @@ class _QuotationScreenState extends State<QuotationScreen> {
     ]),
   ];
 
+void _removeEntry(DataRow selectedData) {
+  int index = rows.indexOf(selectedData);
+  setState(() {
+    rows.removeAt(index);
+  });
+}
 
-  final _itemController = TextEditingController();
-  final _pricePerSftController = TextEditingController();
-  final _totalPriceController = TextEditingController();
-
-  bool _isAddFormVisible = false;
-
-
-
+void _deleteEntry(DataRow selectedData) async {
+  final confirmed = await _showDeleteConfirmationDialog();
+  if (confirmed) {
+    int index = rows.indexOf(selectedData);
+    setState(() {
+      rows.removeAt(index);
+    });
+  }
+}
 
   void _addItem() {
     Navigator.push(
@@ -88,15 +127,17 @@ class _QuotationScreenState extends State<QuotationScreen> {
                   IconButton(
                     icon: Icon(Icons.edit),
                     onPressed: () {
-                     print("here is the logic for edit button");
+                      print("here is the logic for edit button");
                     },
                   ),
                   IconButton(
                     icon: Icon(Icons.delete),
-                    onPressed: () {
-                      setState(() {
-                      rows.removeAt(1);
-              });
+                    onPressed: () async {
+                      final confirmed = await _showDeleteConfirmationDialog();
+                      print("New item value"+newItem);
+                      if (confirmed) {
+                        rows.removeAt(newItem);
+                      }
                     },
                   ),
                 ],
@@ -127,31 +168,4 @@ class _QuotationScreenState extends State<QuotationScreen> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
-
-
-  void generatePDF(List<DataRow> rows) async {
-  final pdf = pdfWidgets.Document();
-
-  pdf.addPage(
-    pdfWidgets.MultiPage(
-      build: (context) => [
-        pdfWidgets.Table.fromTextArray(
-          context: context,
-          data: <List<String>>[
-            <String>['Item', 'Price/Sft', 'Total Price'],
-            ...rows.map((row) => [
-              row.cells[0].child.toString(),
-              row.cells[1].child.toString(),
-              row.cells[2].child.toString(),
-            ]),
-          ],
-        ),
-      ],
-    ),
-  );
-
-final file = File('quotation.pdf');
-Uint8List pdfBytes = await pdf.save();
-await file.writeAsBytes(pdfBytes);
-}
 }

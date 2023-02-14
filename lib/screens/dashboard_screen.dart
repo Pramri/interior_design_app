@@ -100,14 +100,6 @@ void selectCategory(BuildContext ctx){
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text('Last 7 days calls'),
-                // Switch(
-                //   value: _showChart,
-                //   onChanged: (val) {
-                //     setState(() {
-                //       _showChart = val;
-                //     });
-                //   },
-                // ),
               ],
             ),
              Container( 

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import './additemform_screen.dart';
+import './edititemform_screen.dart';
 import 'dart:typed_data';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pdfWidgets;
@@ -92,7 +93,7 @@ class _QuotationScreenState extends State<QuotationScreen> {
                 IconButton(
                   icon: Icon(Icons.edit),
                   onPressed: () {
-                    print("here is the logic for edit button");
+                    _editItem(dataRow!);
                   },
                 ),
                 IconButton(
@@ -112,9 +113,44 @@ class _QuotationScreenState extends State<QuotationScreen> {
           ]);
           if (dataRow != null) {
             // Check if dataRow is not null.
-
             rows.add(dataRow!);
           }
+        });
+      }
+    });
+  }
+
+  void _editItem(DataRow dataRow) {
+    final currentValues = {
+      'item': dataRow.cells[0].child
+          .toString()
+          .replaceAll('Text("', '')
+          .replaceAll('")', ''),
+      'pricePerSft': dataRow.cells[1].child
+          .toString()
+          .replaceAll('Text("', '')
+          .replaceAll('")', ''),
+      'totalPrice': dataRow.cells[2].child
+          .toString()
+          .replaceAll('Text("', '')
+          .replaceAll('")', ''),
+    };
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditItemForm(
+          item: currentValues['item']!,
+          pricePerSft: currentValues['pricePerSft']!,
+          totalPrice: currentValues['totalPrice']!,
+        ),
+      ),
+    ).then((updatedValues) {
+      if (updatedValues != null) {
+        setState(() {
+          dataRow.cells[0] = DataCell(Text(updatedValues['item']));
+          dataRow.cells[1] = DataCell(Text(updatedValues['pricePerSft']));
+          dataRow.cells[2] = DataCell(Text(updatedValues['totalPrice']));
         });
       }
     });

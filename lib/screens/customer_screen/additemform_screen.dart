@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 class AddItemForm extends StatefulWidget {
   @override
   _AddItemFormState createState() => _AddItemFormState();
@@ -11,6 +12,23 @@ class _AddItemFormState extends State<AddItemForm> {
   final _pricePerSftController = TextEditingController();
   final _quantityController = TextEditingController();
   final _totalPriceController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // add listener to Price/Sft and Quantity fields
+    _pricePerSftController.addListener(_calculateTotalPrice);
+    _quantityController.addListener(_calculateTotalPrice);
+  }
+
+  void _calculateTotalPrice() {
+    // calculate Total Price based on Price/Sft and Quantity
+    double pricePerSft = double.tryParse(_pricePerSftController.text) ?? 0;
+    int quantity = int.tryParse(_quantityController.text) ?? 0;
+    double totalPrice = pricePerSft * quantity;
+    // update Total Price field with the calculated value
+    _totalPriceController.text = totalPrice.toStringAsFixed(2);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,8 +61,9 @@ class _AddItemFormState extends State<AddItemForm> {
                   }
                   return null;
                 },
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
               ),
-               TextFormField(
+              TextFormField(
                 controller: _quantityController,
                 decoration: InputDecoration(labelText: 'Quantity'),
                 validator: (value) {
@@ -53,16 +72,12 @@ class _AddItemFormState extends State<AddItemForm> {
                   }
                   return null;
                 },
+                keyboardType: TextInputType.number,
               ),
               TextFormField(
                 controller: _totalPriceController,
                 decoration: InputDecoration(labelText: 'Total Price'),
-                validator: (value) {
-                  if (value?.isEmpty??true) {
-                    return 'Please enter total price';
-                  }
-                  return null;
-                },
+                enabled: false, // disable editing
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12.0),

@@ -23,7 +23,6 @@ class _EditItemFormState extends State<EditItemForm> {
   late final TextEditingController _pricePerSftController;
   late final TextEditingController _quantityController;
   late final TextEditingController _totalPriceController;
-  
 
   @override
   void initState() {
@@ -32,15 +31,28 @@ class _EditItemFormState extends State<EditItemForm> {
     _pricePerSftController = TextEditingController(text: widget.pricePerSft);
     _quantityController = TextEditingController(text: widget.quantity);
     _totalPriceController = TextEditingController(text: widget.totalPrice);
+
+    // add listeners to price per sft and quantity fields
+    _pricePerSftController.addListener(_updateTotalPrice);
+    _quantityController.addListener(_updateTotalPrice);
   }
 
   @override
   void dispose() {
     _itemController.dispose();
+    _pricePerSftController.removeListener(_updateTotalPrice);
     _pricePerSftController.dispose();
+    _quantityController.removeListener(_updateTotalPrice);
     _quantityController.dispose();
     _totalPriceController.dispose();
     super.dispose();
+  }
+
+  void _updateTotalPrice() {
+    final pricePerSft = double.tryParse(_pricePerSftController.text) ?? 0;
+    final quantity = double.tryParse(_quantityController.text) ?? 0;
+    final totalPrice = pricePerSft * quantity;
+    _totalPriceController.text = totalPrice.toStringAsFixed(2);
   }
 
   @override

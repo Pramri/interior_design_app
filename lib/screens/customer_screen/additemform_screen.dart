@@ -9,6 +9,7 @@ class _AddItemFormState extends State<AddItemForm> {
 
   final _itemController = TextEditingController();
   final _pricePerSftController = TextEditingController();
+  final _quantityController = TextEditingController();
   final _totalPriceController = TextEditingController();
 
   @override
@@ -20,7 +21,7 @@ class _AddItemFormState extends State<AddItemForm> {
       body: Form(
         key: _formKey,
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(12.0),
           child: Column(
             children: <Widget>[
               TextFormField(
@@ -43,6 +44,16 @@ class _AddItemFormState extends State<AddItemForm> {
                   return null;
                 },
               ),
+               TextFormField(
+                controller: _quantityController,
+                decoration: InputDecoration(labelText: 'Quantity'),
+                validator: (value) {
+                  if (value?.isEmpty??true) {
+                    return 'Please enter a quantity';
+                  }
+                  return null;
+                },
+              ),
               TextFormField(
                 controller: _totalPriceController,
                 decoration: InputDecoration(labelText: 'Total Price'),
@@ -54,7 +65,7 @@ class _AddItemFormState extends State<AddItemForm> {
                 },
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                padding: const EdgeInsets.symmetric(vertical: 12.0),
                 child: ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState?.validate()??true) {
@@ -63,6 +74,7 @@ class _AddItemFormState extends State<AddItemForm> {
                         {
                           'item': _itemController.text,
                           'pricePerSft': _pricePerSftController.text,
+                          'quantity': _quantityController.text,
                           'totalPrice': _totalPriceController.text,
                         },
                       );

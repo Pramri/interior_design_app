@@ -57,23 +57,6 @@ class _QuotationScreenState extends State<QuotationScreen> {
 
   List<DataRow> rows = [];
 
-  void _removeEntry(DataRow selectedData) {
-    int index = rows.indexOf(selectedData);
-    setState(() {
-      rows.removeAt(index);
-    });
-  }
-
-  void _deleteEntry(DataRow selectedData) async {
-    final confirmed = await _showDeleteConfirmationDialog();
-    if (confirmed) {
-      int index = rows.indexOf(selectedData);
-      setState(() {
-        rows.removeAt(index);
-      });
-    }
-  }
-
   void _addItem() {
     DataRow? dataRow; // Declare the variable as nullable.
     Navigator.push(
@@ -87,6 +70,7 @@ class _QuotationScreenState extends State<QuotationScreen> {
           dataRow = DataRow(cells: [
             DataCell(Text(newItem['item'])),
             DataCell(Text(newItem['pricePerSft'])),
+            DataCell(Text(newItem['quantity'])),
             DataCell(Text(newItem['totalPrice'])),
             DataCell(Row(
               children: [
@@ -130,7 +114,11 @@ class _QuotationScreenState extends State<QuotationScreen> {
           .toString()
           .replaceAll('Text("', '')
           .replaceAll('")', ''),
-      'totalPrice': dataRow.cells[2].child
+      'quantity': dataRow.cells[2].child
+          .toString()
+          .replaceAll('Text("', '')
+          .replaceAll('")', ''),
+      'totalPrice': dataRow.cells[3].child
           .toString()
           .replaceAll('Text("', '')
           .replaceAll('")', ''),
@@ -142,7 +130,9 @@ class _QuotationScreenState extends State<QuotationScreen> {
         builder: (context) => EditItemForm(
           item: currentValues['item']!,
           pricePerSft: currentValues['pricePerSft']!,
+          quantity: currentValues['quantity']!,
           totalPrice: currentValues['totalPrice']!,
+          
         ),
       ),
     ).then((updatedValues) {
@@ -150,7 +140,8 @@ class _QuotationScreenState extends State<QuotationScreen> {
         setState(() {
           dataRow.cells[0] = DataCell(Text(updatedValues['item']));
           dataRow.cells[1] = DataCell(Text(updatedValues['pricePerSft']));
-          dataRow.cells[2] = DataCell(Text(updatedValues['totalPrice']));
+          dataRow.cells[2] = DataCell(Text(updatedValues['quantity']));
+          dataRow.cells[3] = DataCell(Text(updatedValues['totalPrice']));
         });
       }
     });
@@ -159,14 +150,19 @@ class _QuotationScreenState extends State<QuotationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: DataTable(
-        columns: [
-          DataColumn(label: Text('Item')),
-          DataColumn(label: Text('Price/Sft')),
-          DataColumn(label: Text('Total Price')),
-          DataColumn(label: Text('Actions')),
-        ],
-        rows: rows,
+      body: SingleChildScrollView(
+        child: DataTable(
+          //column spacing will help you to provide space properly
+          columnSpacing: 25, 
+          columns: [
+            DataColumn(label: Text('Item')),
+            DataColumn(label: Text('Price/Sft')),
+            DataColumn(label: Text('Quantity')),
+            DataColumn(label: Text('Total Price')),
+            DataColumn(label: Text('Actions'),),
+          ],
+          rows: rows,
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addItem,

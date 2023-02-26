@@ -16,50 +16,114 @@ class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String? _email, _password;
 
+  bool _isLogin = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Login"),
-      ),
+      backgroundColor: Colors.blueGrey,
       body: Form(
         key: _formKey,
-        child: Column(
-          children: <Widget>[
-            TextFormField(
-              validator: (input) {
-                if (input?.isEmpty ?? true) {
-                  return 'Please type an email';
-                }
-                return null;
-              },
-              onSaved: (input) => _email = input,
-              decoration: InputDecoration(
-                labelText: 'Email',
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                _isLogin ? 'Login' : 'Register',
+                style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
               ),
-            ),
-            TextFormField(
-              validator: (input) {
-                if (input?.isEmpty ?? true) {
-                  return 'Please type a password';
-                }
-                return null;
-              },
-              onSaved: (input) => _password = input,
-              decoration: InputDecoration(
-                labelText: 'Password',
+              SizedBox(height: 48),
+              TextFormField(
+                validator: (input) {
+                  if (input?.isEmpty ?? true) {
+                    return 'Please type an email';
+                  }
+                  return null;
+                },
+                onSaved: (input) => _email = input,
+                decoration: InputDecoration(
+                  hintText: 'Enter your email',
+                  filled: true,
+                  fillColor: Colors.grey.shade100,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                ),
               ),
-              obscureText: true,
-            ),
-            ElevatedButton(
-              onPressed: signIn,
-              child: Text('Sign in'),
-            ),
-            ElevatedButton(
-              onPressed: signUp,
-              child: Text('Sign up'),
-            ),
-          ],
+              SizedBox(height: 16),
+              TextFormField(
+                validator: (input) {
+                  if (input?.isEmpty ?? true) {
+                    return 'Please type a password';
+                  }
+                  return null;
+                },
+                onSaved: (input) => _password = input,
+                decoration: InputDecoration(
+                  hintText: 'Enter your password',
+                  filled: true,
+                  fillColor: Colors.grey.shade100,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                ),
+                obscureText: true,
+              ),
+              SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _isLogin = true;
+                    });
+                    signIn();
+                  },
+                  child: Text(
+                    'Sign in',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: () {
+                    setState(() {
+                      _isLogin = false;
+                    });
+                    signUp();
+                  },
+                  child: Text(
+                    'Sign up',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    side: BorderSide(color: Colors.blue),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -91,7 +155,7 @@ class _LoginPageState extends State<LoginPage> {
         );
         Navigator.pushReplacementNamed(context, widget.redirectPage);
       } catch (e) {
-        print(e);
+        print("Signup failed");
       }
     }
   }

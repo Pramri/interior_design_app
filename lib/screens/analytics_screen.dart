@@ -1,19 +1,22 @@
-
-
 import 'package:flutter/material.dart';
-// import 'package:http/http.dart' as http;
-import 'dart:convert';
 
-class AnalyticsScreen extends StatefulWidget {
-  @override
-  _AnalyticsScreenState createState() => _AnalyticsScreenState();
-}
+class AnalyticsScreen extends StatelessWidget {
+  final Function logout;
 
-class _AnalyticsScreenState extends State<AnalyticsScreen> {
+  AnalyticsScreen({required this.logout});
+
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text("Analytics"),
+   return 
+      //Combination of color, style, fonts etcc...
+        Center(
+          child: ElevatedButton(
+            child: Text('Logout'),
+            onPressed: () {
+              logout();
+              Navigator.pushReplacementNamed(context, '/login');
+            },
+          ),
     );
   }
 }

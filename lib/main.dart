@@ -1,6 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:interior_design_app/screens/analytics_screen.dart';
 import './screens/main_screen.dart';
 import './screens/tabs_screen.dart';
 import './screens/dashboard_screen.dart';
@@ -14,10 +14,11 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
-    TextStyle titleTextStyle() {
+  TextStyle titleTextStyle() {
     return TextStyle(
         fontFamily: 'OpenSans', fontSize: 20, fontWeight: FontWeight.bold);
   }
+
   @override
   _MyAppState createState() => _MyAppState();
 }
@@ -29,16 +30,30 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       _isLoggedIn = true;
     });
-    print("**********************************************");
-    print(_isLoggedIn);
-    print("**********************************************");
   }
 
   void _logout() {
+    print("entered.....");
     setState(() {
       _isLoggedIn = false;
     });
+    print("exited.....");
   }
+
+  Route<dynamic> generateRoute(RouteSettings settings) {
+    switch (settings.name) {
+      case '/login':
+        return MaterialPageRoute(
+          builder: (context) =>
+              LoginPage(redirectPage: '/mainpage', login: _login),
+        );
+      // Add more cases for additional routes as needed
+      default:
+        // If there is no such named route in the switch statement, throw an error
+        throw Exception('Invalid route: ${settings.name}');
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -54,13 +69,17 @@ class _MyAppState extends State<MyApp> {
                   fontFamily: 'OpenSans',
                   fontSize: 20,
                   fontWeight: FontWeight.bold))),
-      home: _isLoggedIn ? MainPage() : LoginPage(redirectPage: '/mainpage', login: _login),
-
+      home: _isLoggedIn
+          ? TabsScreen(logout: _logout)
+          : LoginPage(redirectPage: '/test', login: _login),
       routes: {
         '/dashboard': (ctx) => DashboardScreen(),
         '/filter': (ctx) => FilterScreen(),
-        '/mainpage': (ctx) => MainPage(),
+        '/mainpage': (ctx) => MainPage(logout: _logout),
+        '/analytics': (ctx) => AnalyticsScreen(logout: _logout),
+        '/test': (ctx)=> TabsScreen(logout: _logout),
       },
+      onGenerateRoute: generateRoute,
     );
   }
 }

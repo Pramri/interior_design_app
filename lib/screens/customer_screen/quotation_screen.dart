@@ -3,11 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import './additemform_screen.dart';
 import './edititemform_screen.dart';
-import 'dart:typed_data';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pdfWidgets;
-import 'package:path_provider/path_provider.dart';
-import 'package:pdf_viewer_plugin/pdf_viewer_plugin.dart';
+
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:async';
 
 class QuotationScreen extends StatefulWidget {
   const QuotationScreen({Key? key}) : super(key: key);
@@ -18,11 +17,26 @@ class QuotationScreen extends StatefulWidget {
 
 class _QuotationScreenState extends State<QuotationScreen> {
   int _selectedPageIndex = 0;
+  double summary = 0.0;
+  bool _isApiCallInProgress = false;
 
   void _selectPage(int index) {
     setState(() {
       _selectedPageIndex = index;
     });
+  }
+
+  Map<String, dynamic>? quotationData;
+
+  Future<Map<String, dynamic>> _fetchQuotation() async {
+    //When updated from local host to IP address, able to see the output..later will replace with actual code
+    final response =
+        await http.get(Uri.parse('http://192.168.225.156:3000/quotation'));
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to load quotation');
+    }
   }
 
   //Below code is to display the dialog before completing
@@ -57,7 +71,25 @@ class _QuotationScreenState extends State<QuotationScreen> {
 
   List<DataRow> rows = [];
 
+  double _calculateTotalPrice() {
+    double sum = 0;
+    for (var row in rows) {
+      sum += double.parse(row.cells[3].child
+          .toString()
+          .replaceAll('Text("', '')
+          .replaceAll('")', ''));
+    }
+    return sum;
+  }
+
   void _addItem() {
+    if(_isApiCallInProgress){
+      return;
+    }
+    setState(() {
+      _isApiCallInProgress = true; // set this to true when the API call starts
+    });
+
     DataRow? dataRow; // Declare the variable as nullable.
     Navigator.push(
       context,
@@ -88,6 +120,7 @@ class _QuotationScreenState extends State<QuotationScreen> {
                       // Check if dataRow is not null.
                       setState(() {
                         rows.remove(dataRow);
+                        summary -= double.parse(newItem['totalPrice']);
                       });
                     }
                   },
@@ -98,9 +131,15 @@ class _QuotationScreenState extends State<QuotationScreen> {
           if (dataRow != null) {
             // Check if dataRow is not null.
             rows.add(dataRow!);
+            summary += double.parse(newItem['totalPrice']);
           }
         });
       }
+
+      setState(() {
+        _isApiCallInProgress =
+            false; // set this back to false when the API call completes
+      });
     });
   }
 
@@ -124,51 +163,103 @@ class _QuotationScreenState extends State<QuotationScreen> {
           .replaceAll('")', ''),
     };
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditItemForm(
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return EditItemForm(
           item: currentValues['item']!,
           pricePerSft: currentValues['pricePerSft']!,
           quantity: currentValues['quantity']!,
           totalPrice: currentValues['totalPrice']!,
-          
-        ),
-      ),
+        );
+      },
     ).then((updatedValues) {
       if (updatedValues != null) {
         setState(() {
-          dataRow.cells[0] = DataCell(Text(updatedValues['item']));
-          dataRow.cells[1] = DataCell(Text(updatedValues['pricePerSft']));
-          dataRow.cells[2] = DataCell(Text(updatedValues['quantity']));
-          dataRow.cells[3] = DataCell(Text(updatedValues['totalPrice']));
+          dataRow.cells[0] = DataCell(Text(updatedValues['item']!));
+          dataRow.cells[1] = DataCell(Text(updatedValues['pricePerSft']!));
+          dataRow.cells[2] = DataCell(Text(updatedValues['quantity']!));
+          dataRow.cells[3] = DataCell(Text(updatedValues['totalPrice']!));
         });
       }
     });
   }
 
+  StreamSubscription? _subscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _subscription = _fetchQuotation().asStream().listen((data) {
+      setState(() {
+        quotationData = data;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: DataTable(
-          //column spacing will help you to provide space properly
-          columnSpacing: 25, 
-          columns: [
-            DataColumn(label: Text('Item')),
-            DataColumn(label: Text('Price/Sft')),
-            DataColumn(label: Text('Quantity')),
-            DataColumn(label: Text('Total Price')),
-            DataColumn(label: Text('Actions'),),
-          ],
-          rows: rows,
+    if (rows.isEmpty) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("No records found"),
+              SizedBox(height: 16),
+              FloatingActionButton(
+                onPressed: _addItem,
+                child: Icon(Icons.add),
+              ),
+            ],
+          ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addItem,
-        child: Icon(Icons.add),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-    );
+      );
+    } else {
+      return Scaffold(
+        body: SizedBox(
+          height: MediaQuery.of(context).size.height - 500,
+          child: SingleChildScrollView(
+            child:
+                _isApiCallInProgress // display the CircularProgressIndicator widget only when the API call is being made
+                    ? Center(child: CircularProgressIndicator())
+                    : DataTable(
+                        //column spacing will help you to provide space properly
+                        dataRowHeight: 25,
+                        columnSpacing: 25,
+                        columns: [
+                          DataColumn(label: Text('Item')),
+                          DataColumn(label: Text('Price/Sft')),
+                          DataColumn(label: Text('Quantity')),
+                          DataColumn(label: Text('Total Price')),
+                          DataColumn(
+                            label: Text('Actions'),
+                          ),
+                        ],
+                        rows: rows,
+                      ),
+          ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            FloatingActionButton(
+              onPressed: _addItem,
+              child: Icon(Icons.add),
+            ),
+            SizedBox(height: 16),
+            //Text("Total Quotation Amounts: $summary"),
+            Text("Total Quotation Amounts: $quotationData"),
+          ],
+        ),
+      );
+    }
   }
 }

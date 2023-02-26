@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "645588717648",
-    "project_id": "flutter-interior",
-    "storage_bucket": "flutter-interior.appspot.com"
+    "project_number": "869476661881",
+    "project_id": "pramri",
+    "storage_bucket": "pramri.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:645588717648:android:d6dfe422de92d9bc5b4155",
+        "mobilesdk_app_id": "1:869476661881:android:db7be268132617a7e6b2a8",
         "android_client_info": {
-          "package_name": "com.example.interior_design_app"
+          "package_name": "com.pramri"
         }
       },
       "oauth_client": [
         {
-          "client_id": "645588717648-k26uibkvo0f8lom01jpdo73bgvgg5mcs.apps.googleusercontent.com",
+          "client_id": "869476661881-afl0j3i2cgitef2cdd0jaom6rjnu9368.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDTuo_oWnwpTZx7mKJV7h-OTp1iuuz5wX4"
+          "current_key": "AIzaSyBe1aGjIbTpaWITr99QEpIpNikP62tSnos"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "645588717648-k26uibkvo0f8lom01jpdo73bgvgg5mcs.apps.googleusercontent.com",
+              "client_id": "869476661881-afl0j3i2cgitef2cdd0jaom6rjnu9368.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

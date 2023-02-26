@@ -1,24 +1,45 @@
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:interior_design_app/screens/subtab_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import './screens/main_screen.dart';
 import './screens/tabs_screen.dart';
-import './widgets/new_transaction.dart';
-import './model/transaction.dart';
-import './widgets/transaction_list.dart';
-import './widgets/chart.dart';
 import './screens/dashboard_screen.dart';
 import './screens/filter_screen.dart';
-void main() {
+import './login.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-
-  TextStyle titleTextStyle (){
-     return TextStyle(fontFamily: 'OpenSans',fontSize: 20, fontWeight: FontWeight.bold);
+class MyApp extends StatefulWidget {
+    TextStyle titleTextStyle() {
+    return TextStyle(
+        fontFamily: 'OpenSans', fontSize: 20, fontWeight: FontWeight.bold);
   }
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool _isLoggedIn = false;
+
+  void _login() {
+    setState(() {
+      _isLoggedIn = true;
+    });
+    print("**********************************************");
+    print(_isLoggedIn);
+    print("**********************************************");
+  }
+
+  void _logout() {
+    setState(() {
+      _isLoggedIn = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -29,13 +50,16 @@ class MyApp extends StatelessWidget {
           errorColor: Colors.red,
           fontFamily: 'Open Sans',
           appBarTheme: AppBarTheme(
-              titleTextStyle: titleTextStyle())),
-      //home: DashboardScreen(),
+              titleTextStyle: TextStyle(
+                  fontFamily: 'OpenSans',
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold))),
+      home: _isLoggedIn ? MainPage() : LoginPage(redirectPage: '/mainpage', login: _login),
+
       routes: {
-        '/' : (ctx) => TabsScreen(),
         '/dashboard': (ctx) => DashboardScreen(),
         '/filter': (ctx) => FilterScreen(),
-        
+        '/mainpage': (ctx) => MainPage(),
       },
     );
   }

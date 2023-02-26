@@ -94,6 +94,7 @@ class _EditItemFormState extends State<EditItemForm> {
                 labelText: 'Total Price',
                 border: OutlineInputBorder(),
               ),
+              enabled: false,
             ),
             SizedBox(height: 12),
             ElevatedButton(

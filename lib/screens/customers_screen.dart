@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../model/quotationdata.dart';
 import './customer_screen/additemform_screen.dart';
+import 'package:http/http.dart' as http;
 
 class CustomersScreen extends StatefulWidget {
   @override

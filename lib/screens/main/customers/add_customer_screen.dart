@@ -68,7 +68,7 @@ class _AddCustomerFormState extends State<AddCustomerForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Name'),
+        title: Text('Add Customer'),
       ),
       body: Form(
         key: _formKey,

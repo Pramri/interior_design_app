@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import './customers_screen.dart';
 import 'analytics_screen.dart';
 import './customer_screen/expense_screen.dart';
 import './customer_screen/overview_screen.dart';

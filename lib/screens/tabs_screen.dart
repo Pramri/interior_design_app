@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../screens/subtab_screen.dart';
-import './customers_screen.dart';
+import 'main/customers/customers_screen.dart';
 import 'analytics_screen.dart';
 import './dashboard_screen.dart';
 import '../main.dart';

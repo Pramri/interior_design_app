@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import './add_customer_screen.dart';
-import './edit_customer_screen.dart';
+import 'add_customer_screen.dart';
+import 'edit_customer_screen.dart';
 
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -15,7 +15,6 @@ class CustomerScreen extends StatefulWidget {
 
 class _CustomerScreenState extends State<CustomerScreen> {
   int _selectedPageIndex = 0;
-  double summary = 0.0;
   bool _isApiCallInProgress = false;
 
   void _selectPage(int index) {
@@ -40,7 +39,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
         List<DataRow> newRows = [];
         DataRow? dataRow;
         for (final customer in data) {
-            dataRow = DataRow(cells: [
+          dataRow = DataRow(cells: [
             DataCell(Text(customer['name'] ?? '')),
             DataCell(Text(customer['email'] ?? '')),
             DataCell(Text(customer['mobileNumber'] ?? '')),
@@ -87,6 +86,25 @@ class _CustomerScreenState extends State<CustomerScreen> {
   }
 
 
+Future<http.Response> _createCustomers(String name, String email, String mobileNumber, String address) async {
+  final apiUrl = Uri.parse('http://192.168.0.100:3000/api/interiors/pDoS87aUANGcfFin8aWi/customers');
+
+  Map<String, dynamic> data = {
+    'name': name,
+    'email': email,
+    'mobileNumber': mobileNumber,
+    'address': address,
+  };
+
+  final response = await http.post(
+    apiUrl,
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode(data),
+  );
+
+  return response;
+}
+
   //Below code is to display the dialog before completing
   Future<bool> _showDeleteConfirmationDialog() async {
     final confirmed = await showDialog<bool>(
@@ -119,66 +137,83 @@ class _CustomerScreenState extends State<CustomerScreen> {
 
   List<DataRow> rows = [];
 
-  void _addname() {
-    if (_isApiCallInProgress) {
-      return;
-    }
-    setState(() {
-      _isApiCallInProgress = true; // set this to true when the API call starts
-    });
-
-    DataRow? dataRow; // Declare the variable as nullable.
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AddCustomerForm(),
-      ),
-    ).then((newname) {
-      if (newname != null) {
-        setState(() {
-          dataRow = DataRow(cells: [
-            DataCell(Text(newname['name'])),
-            DataCell(Text(newname['email'])),
-            DataCell(Text(newname['mobileNumber'])),
-            DataCell(Text(newname['address'])),
-            DataCell(Row(
-              children: [
-                IconButton(
-                  icon: Icon(Icons.edit),
-                  onPressed: () {
-                    _editname(dataRow!);
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () async {
-                    final confirmed = await _showDeleteConfirmationDialog();
-                    if (confirmed && dataRow != null) {
-                      // Check if dataRow is not null.
-                      setState(() {
-                        rows.remove(dataRow);
-                        summary -= double.parse(newname['address']);
-                      });
-                    }
-                  },
-                ),
-              ],
-            )),
-          ]);
-          if (dataRow != null) {
-            // Check if dataRow is not null.
-            rows.add(dataRow!);
-            summary += double.parse(newname['address']);
-          }
-        });
-      }
-
-      setState(() {
-        _isApiCallInProgress =
-            false; // set this back to false when the API call completes
-      });
-    });
+void _addname() {
+  if (_isApiCallInProgress) {
+    return;
   }
+  setState(() {
+    _isApiCallInProgress = true; // set this to true when the API call starts
+  });
+
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => AddCustomerForm(),
+    ),
+  ).then((newname) {
+    if (newname != null) {
+      print("**************************");
+      print(newname['name']);
+      print(newname['email']);
+      print(newname['mobileNumber']);
+      print(newname['address']);
+      print("**************************");
+      DataRow? dataRow;
+      _createCustomers(
+              newname['name'], newname['email'], newname['mobileNumber'], newname['address'])
+          .then((response) {
+        if (response.statusCode == 200) {
+          setState(() {
+              dataRow = DataRow(cells: [
+              DataCell(Text(newname['name'])),
+              DataCell(Text(newname['email'])),
+              DataCell(Text(newname['mobileNumber'])),
+              DataCell(Text(newname['address'])),
+              DataCell(Row(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.edit),
+                    onPressed: () {
+                      _editname(dataRow!);
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () async {
+                      final confirmed = await _showDeleteConfirmationDialog();
+                      if (confirmed) {
+                        setState(() {
+                          rows.remove(dataRow);
+                        });
+                      }
+                    },
+                  ),
+                ],
+              )),
+            ]);
+            rows.add(dataRow!);
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to add customer'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }).whenComplete(() {
+        setState(() {
+          _isApiCallInProgress = false; // set this back to false when the API call completes
+        });
+      });
+    } else {
+      setState(() {
+        _isApiCallInProgress = false; // set this back to false when the user cancels the form
+      });
+    }
+  });
+}
+
 
   void _editname(DataRow dataRow) {
     final currentValues = {

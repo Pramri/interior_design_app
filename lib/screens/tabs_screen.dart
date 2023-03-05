@@ -28,7 +28,8 @@ class _TabsScreenState extends State<TabsScreen> {
     super.initState();
     _pages = [
       {'page': DashboardScreen(), 'title': 'Dashboard'},
-      {'page': CustomersScreen(), 'title': 'Customers'},
+      // {'page': CustomersScreen(email: "Test", interiorId: "pDoS87aUANGcfFin8aWi"), 'title': 'Customers'},
+      {'page': CustomerScreen(), 'title': 'Customers'},
       {'page': AnalyticsScreen(logout: _logout), 'title': 'Analytics'},
       {'page': SubTabScreen(), 'title': 'Account'},
     ];

@@ -137,9 +137,6 @@ class _LoginPageState extends State<LoginPage> {
           email: _email!,
           password: _password!,
         );
-        print("+++++++++++Credentials++++++++++++++++++++++");
-        print(userCredential.user?.email);
-        print("+++++++++++Credentials++++++++++++++++++++++");
         Navigator.pushReplacementNamed(context, widget.redirectPage);
       } catch (e) {
         print("Signin failed");

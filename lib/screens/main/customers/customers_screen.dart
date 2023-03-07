@@ -16,7 +16,7 @@ class CustomerScreen extends StatefulWidget {
 class _CustomerScreenState extends State<CustomerScreen> {
   int _selectedPageIndex = 0;
   bool _isApiCallInProgress = false;
-
+List<DataRow> rows = [];
   void _selectPage(int index) {
     setState(() {
       _selectedPageIndex = index;
@@ -36,7 +36,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        List<DataRow> newRows = [];
+
         DataRow? dataRow;
         for (final customer in data) {
           dataRow = DataRow(cells: [
@@ -58,7 +58,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
                     final confirmed = await _showDeleteConfirmationDialog();
                     if (confirmed) {
                       setState(() {
-                        newRows.remove(dataRow);
+                        rows.remove(dataRow);
                       });
                     }
                   },
@@ -66,13 +66,13 @@ class _CustomerScreenState extends State<CustomerScreen> {
               ],
             )),
           ]);
-          newRows.add(dataRow);
+          rows.add(dataRow);
         }
 
         setState(() {
           customersData = data;
+          rows = rows;
         });
-        rows = newRows;
       } else {
         throw Exception('Failed to load customers');
       }
@@ -85,6 +85,9 @@ class _CustomerScreenState extends State<CustomerScreen> {
     }
   }
 
+DataColumn actionColumn = DataColumn(
+  label: Text('Action'),
+);
 
 Future<http.Response> _createCustomers(String name, String email, String mobileNumber, String address) async {
   final apiUrl = Uri.parse('http://192.168.0.100:3000/api/interiors/pDoS87aUANGcfFin8aWi/customers');
@@ -97,6 +100,25 @@ Future<http.Response> _createCustomers(String name, String email, String mobileN
   };
 
   final response = await http.post(
+    apiUrl,
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode(data),
+  );
+
+  return response;
+}
+
+Future<http.Response> _updateCustomer(String customerId, String name, String email, String mobileNumber, String address) async {
+  final apiUrl = Uri.parse('http://192.168.0.100:3000/api/interiors/pDoS87aUANGcfFin8aWi/customers/$customerId');
+
+  Map<String, dynamic> data = {
+    'name': name,
+    'email': email,
+    'mobileNumber': mobileNumber,
+    'address': address,
+  };
+
+  final response = await http.put(
     apiUrl,
     headers: {'Content-Type': 'application/json'},
     body: jsonEncode(data),
@@ -135,7 +157,8 @@ Future<http.Response> _createCustomers(String name, String email, String mobileN
     return confirmed ?? false;
   }
 
-  List<DataRow> rows = [];
+  //List<DataRow> rows = [];
+  
 
 void _addname() {
   if (_isApiCallInProgress) {
@@ -152,12 +175,6 @@ void _addname() {
     ),
   ).then((newname) {
     if (newname != null) {
-      print("**************************");
-      print(newname['name']);
-      print(newname['email']);
-      print(newname['mobileNumber']);
-      print(newname['address']);
-      print("**************************");
       DataRow? dataRow;
       _createCustomers(
               newname['name'], newname['email'], newname['mobileNumber'], newname['address'])
@@ -306,11 +323,10 @@ void _addname() {
                           DataColumn(label: Text('Email')),
                           DataColumn(label: Text('Phone')),
                           DataColumn(label: Text('Address')),
-                          DataColumn(
-                            label: Text('Actions'),
-                          ),
+                          actionColumn,
                         ],
-                        rows: rows,
+                      rows: rows,
+                      
                       ),
           ),
         ),

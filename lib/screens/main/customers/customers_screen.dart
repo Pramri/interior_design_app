@@ -315,33 +315,33 @@ class _CustomerScreenState extends State<CustomerScreen> {
                 _isApiCallInProgress // display the CircularProgressIndicator widget only when the API call is being made
                     ? Center(child: CircularProgressIndicator())
                     : DataTable(
-                       dataRowHeight: 30,
-                        columnSpacing: 8,
+                       dataRowHeight: 50,
+                        columnSpacing: 2,
                         columns: [
                           DataColumn(
                               label: Text(
                             'Name',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purple),
                           )),
                           DataColumn(
                               label: Text(
                             'Email',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purple),
                           )),
                           DataColumn(
                               label: Text(
                             'Phone',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purple),
                           )),
                           DataColumn(
                               label: Text(
                             'Address',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purple),
                           )),
                           DataColumn(
                               label: Text(
                             'Actions',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purple),
                           )),
                         ],
                         rows: rows,

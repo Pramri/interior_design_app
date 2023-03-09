@@ -16,7 +16,7 @@ class CustomerScreen extends StatefulWidget {
 class _CustomerScreenState extends State<CustomerScreen> {
   int _selectedPageIndex = 0;
   bool _isApiCallInProgress = false;
-List<DataRow> rows = [];
+  List<DataRow> rows = [];
   void _selectPage(int index) {
     setState(() {
       _selectedPageIndex = index;
@@ -44,22 +44,20 @@ List<DataRow> rows = [];
             DataCell(Text(customer['email'] ?? '')),
             DataCell(Text(customer['mobileNumber'] ?? '')),
             DataCell(Text(customer['address'] ?? '')),
-            DataCell(Row(
-              children: [
-                IconButton(
-                  icon: Icon(Icons.edit),
-                  onPressed: () {
-                    _editname(dataRow!);
+            DataCell(PopupMenuButton(
+              itemBuilder: (ctx) => [
+                PopupMenuItem(
+                  child: Text("Edit"),
+                  onTap: () {
+                    _editname(customer);
                   },
                 ),
-                IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () async {
+                PopupMenuItem(
+                  child: Text("Delete"),
+                  onTap: () async {
                     final confirmed = await _showDeleteConfirmationDialog();
                     if (confirmed) {
-                      setState(() {
-                        rows.remove(dataRow);
-                      });
+                      print("Deleted");
                     }
                   },
                 ),
@@ -85,47 +83,51 @@ List<DataRow> rows = [];
     }
   }
 
-DataColumn actionColumn = DataColumn(
-  label: Text('Action'),
-);
-
-Future<http.Response> _createCustomers(String name, String email, String mobileNumber, String address) async {
-  final apiUrl = Uri.parse('http://192.168.0.100:3000/api/interiors/pDoS87aUANGcfFin8aWi/customers');
-
-  Map<String, dynamic> data = {
-    'name': name,
-    'email': email,
-    'mobileNumber': mobileNumber,
-    'address': address,
-  };
-
-  final response = await http.post(
-    apiUrl,
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode(data),
+  DataColumn actionColumn = DataColumn(
+    label: Text('Action'),
   );
 
-  return response;
-}
+  Future<http.Response> _createCustomers(
+      String name, String email, String mobileNumber, String address) async {
+    final apiUrl = Uri.parse(
+        'http://192.168.0.100:3000/api/interiors/pDoS87aUANGcfFin8aWi/customers');
 
-Future<http.Response> _updateCustomer(String customerId, String name, String email, String mobileNumber, String address) async {
-  final apiUrl = Uri.parse('http://192.168.0.100:3000/api/interiors/pDoS87aUANGcfFin8aWi/customers/$customerId');
+    Map<String, dynamic> data = {
+      'name': name,
+      'email': email,
+      'mobileNumber': mobileNumber,
+      'address': address,
+    };
 
-  Map<String, dynamic> data = {
-    'name': name,
-    'email': email,
-    'mobileNumber': mobileNumber,
-    'address': address,
-  };
+    final response = await http.post(
+      apiUrl,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(data),
+    );
 
-  final response = await http.put(
-    apiUrl,
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode(data),
-  );
+    return response;
+  }
 
-  return response;
-}
+  Future<http.Response> _updateCustomer(String customerId, String name,
+      String email, String mobileNumber, String address) async {
+    final apiUrl = Uri.parse(
+        'http://192.168.0.100:3000/api/interiors/pDoS87aUANGcfFin8aWi/customers/$customerId');
+
+    Map<String, dynamic> data = {
+      'name': name,
+      'email': email,
+      'mobileNumber': mobileNumber,
+      'address': address,
+    };
+
+    final response = await http.put(
+      apiUrl,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(data),
+    );
+
+    return response;
+  }
 
   //Below code is to display the dialog before completing
   Future<bool> _showDeleteConfirmationDialog() async {
@@ -158,79 +160,78 @@ Future<http.Response> _updateCustomer(String customerId, String name, String ema
   }
 
   //List<DataRow> rows = [];
-  
 
-void _addname() {
-  if (_isApiCallInProgress) {
-    return;
-  }
-  setState(() {
-    _isApiCallInProgress = true; // set this to true when the API call starts
-  });
-
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => AddCustomerForm(),
-    ),
-  ).then((newname) {
-    if (newname != null) {
-      DataRow? dataRow;
-      _createCustomers(
-              newname['name'], newname['email'], newname['mobileNumber'], newname['address'])
-          .then((response) {
-        if (response.statusCode == 200) {
-          setState(() {
-              dataRow = DataRow(cells: [
-              DataCell(Text(newname['name'])),
-              DataCell(Text(newname['email'])),
-              DataCell(Text(newname['mobileNumber'])),
-              DataCell(Text(newname['address'])),
-              DataCell(Row(
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.edit),
-                    onPressed: () {
-                      _editname(dataRow!);
-                    },
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () async {
-                      final confirmed = await _showDeleteConfirmationDialog();
-                      if (confirmed) {
-                        setState(() {
-                          rows.remove(dataRow);
-                        });
-                      }
-                    },
-                  ),
-                ],
-              )),
-            ]);
-            rows.add(dataRow!);
-          });
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Failed to add customer'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      }).whenComplete(() {
-        setState(() {
-          _isApiCallInProgress = false; // set this back to false when the API call completes
-        });
-      });
-    } else {
-      setState(() {
-        _isApiCallInProgress = false; // set this back to false when the user cancels the form
-      });
+  void _addname() {
+    if (_isApiCallInProgress) {
+      return;
     }
-  });
-}
+    setState(() {
+      _isApiCallInProgress = true; // set this to true when the API call starts
+    });
 
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddCustomerForm(),
+      ),
+    ).then((newname) {
+      if (newname != null) {
+        DataRow? dataRow;
+        _createCustomers(newname['name'], newname['email'],
+                newname['mobileNumber'], newname['address'])
+            .then((response) {
+          if (response.statusCode == 200) {
+            setState(() {
+              dataRow = DataRow(cells: [
+                DataCell(Text(newname['name'])),
+                DataCell(Text(newname['email'])),
+                DataCell(Text(newname['mobileNumber'])),
+                DataCell(Text(newname['address'])),
+                DataCell(PopupMenuButton(
+              itemBuilder: (ctx) => [
+                PopupMenuItem(
+                  child: Text("Edit"),
+                  onTap: () {
+                    // _editname("Test");
+                    print("Hi");
+                  },
+                ),
+                PopupMenuItem(
+                  child: Text("Delete"),
+                  onTap: () async {
+                    final confirmed = await _showDeleteConfirmationDialog();
+                    if (confirmed) {
+                      print("Deleted");
+                    }
+                  },
+                ),
+              ],
+            )),
+              ]);
+              rows.add(dataRow!);
+            });
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Failed to add customer'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }).whenComplete(() {
+          setState(() {
+            _isApiCallInProgress =
+                false; // set this back to false when the API call completes
+          });
+        });
+      } else {
+        setState(() {
+          _isApiCallInProgress =
+              false; // set this back to false when the user cancels the form
+        });
+      }
+    });
+  }
 
   void _editname(DataRow dataRow) {
     final currentValues = {
@@ -309,24 +310,41 @@ void _addname() {
     } else {
       return Scaffold(
         body: SizedBox(
-          height: MediaQuery.of(context).size.height - 500,
           child: SingleChildScrollView(
             child:
                 _isApiCallInProgress // display the CircularProgressIndicator widget only when the API call is being made
                     ? Center(child: CircularProgressIndicator())
                     : DataTable(
-                        //column spacing will help you to provide space properly
-                        dataRowHeight: 25,
-                        columnSpacing: 25,
+                       dataRowHeight: 30,
+                        columnSpacing: 8,
                         columns: [
-                          DataColumn(label: Text('Name')),
-                          DataColumn(label: Text('Email')),
-                          DataColumn(label: Text('Phone')),
-                          DataColumn(label: Text('Address')),
-                          actionColumn,
+                          DataColumn(
+                              label: Text(
+                            'Name',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          )),
+                          DataColumn(
+                              label: Text(
+                            'Email',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          )),
+                          DataColumn(
+                              label: Text(
+                            'Phone',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          )),
+                          DataColumn(
+                              label: Text(
+                            'Address',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          )),
+                          DataColumn(
+                              label: Text(
+                            'Actions',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          )),
                         ],
-                      rows: rows,
-                      
+                        rows: rows,
                       ),
           ),
         ),

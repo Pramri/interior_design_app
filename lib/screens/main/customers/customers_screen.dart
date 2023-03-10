@@ -110,9 +110,11 @@ class _CustomerScreenState extends State<CustomerScreen> {
 
   Future<http.Response> _updateCustomer(String customerId, String name,
       String email, String mobileNumber, String address) async {
-    final apiUrl = Uri.parse(
-        'http://192.168.0.100:3000/api/interiors/pDoS87aUANGcfFin8aWi/customers/$customerId');
 
+    final apiUrl = Uri.parse(
+        'http://localhost:3000/api/interiors/pDoS87aUANGcfFin8aWi/customers/3LIaY1ahi2LwhBJezgyt');
+        print(apiUrl);
+        print("**********************************");
     Map<String, dynamic> data = {
       'name': name,
       'email': email,
@@ -233,48 +235,76 @@ class _CustomerScreenState extends State<CustomerScreen> {
     });
   }
 
-  void _editname(DataRow dataRow) {
-    final currentValues = {
-      'name': dataRow.cells[0].child
-          .toString()
-          .replaceAll('Text("', '')
-          .replaceAll('")', ''),
-      'email': dataRow.cells[1].child
-          .toString()
-          .replaceAll('Text("', '')
-          .replaceAll('")', ''),
-      'mobileNumber': dataRow.cells[2].child
-          .toString()
-          .replaceAll('Text("', '')
-          .replaceAll('")', ''),
-      'address': dataRow.cells[3].child
-          .toString()
-          .replaceAll('Text("', '')
-          .replaceAll('")', ''),
-    };
-
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return EditCustomerForm(
-          name: currentValues['name']!,
-          email: currentValues['email']!,
-          mobileNumber: currentValues['mobileNumber']!,
-          address: currentValues['address']!,
-        );
-      },
-    ).then((updatedValues) {
-      if (updatedValues != null) {
-        setState(() {
-          dataRow.cells[0] = DataCell(Text(updatedValues['name']!));
-          dataRow.cells[1] = DataCell(Text(updatedValues['email']!));
-          dataRow.cells[2] = DataCell(Text(updatedValues['mobileNumber']!));
-          dataRow.cells[3] = DataCell(Text(updatedValues['address']!));
-        });
-      }
-    });
+void _editname(dynamic customer) {
+  if (_isApiCallInProgress) {
+    return;
   }
+  setState(() {
+    _isApiCallInProgress = true; // set this to true when the API call starts
+  });
+  print(customer);
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => EditCustomerForm(customer: customer),
+    ),
+  ).then((editedCustomer) {
+    if (editedCustomer != null) {
+      print(editedCustomer);
+      _updateCustomer(
+              customer['id'],
+              editedCustomer['name'],
+              editedCustomer['email'],
+              editedCustomer['mobileNumber'],
+              editedCustomer['address'])
+          .then((response) {
+        if (response.statusCode == 200) {
+          setState(() {
+            final int index = customersData!
+                .indexWhere((element) => element['id'] == customer['id']);
+            customersData![index] = editedCustomer;
+            rows[index] = DataRow(cells: [
+              DataCell(Text(editedCustomer['name'] ?? '')),
+              DataCell(Text(editedCustomer['email'] ?? '')),
+              DataCell(Text(editedCustomer['mobileNumber'] ?? '')),
+              DataCell(Text(editedCustomer['address'] ?? '')),
+              DataCell(PopupMenuButton(
+                itemBuilder: (ctx) => [
+                  PopupMenuItem(
+                    child: Text("Edit"),
+                    onTap: () {
+                      _editname(editedCustomer);
+                    },
+                  ),
+                  PopupMenuItem(
+                    child: Text("Delete"),
+                    onTap: () async {
+                      final confirmed =
+                          await _showDeleteConfirmationDialog();
+                      if (confirmed) {
+                        print("Deleted");
+                      }
+                    },
+                  ),
+                ],
+              )),
+            ]);
+          });
+        }
+        setState(() {
+          _isApiCallInProgress = false; // set this to false when the API call ends
+        });
+      });
+    } else {
+      setState(() {
+        _isApiCallInProgress = false; // set this to false when the API call ends
+      });
+    }
+  });
+}
 
+
+  
   StreamSubscription? _subscription;
 
   @override

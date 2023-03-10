@@ -1,18 +1,9 @@
 import 'package:flutter/material.dart';
 
 class EditCustomerForm extends StatefulWidget {
-  final String name;
-  final String email;
-  final String mobileNumber;
-  final String address;
+  final Map<String, dynamic> customer;
 
-  const EditCustomerForm({
-    Key? key,
-    required this.name,
-    required this.email,
-    required this.mobileNumber,
-    required this.address,
-  }) : super(key: key);
+  const EditCustomerForm({Key? key, required this.customer}) : super(key: key);
 
   @override
   _EditCustomerFormState createState() => _EditCustomerFormState();
@@ -27,12 +18,12 @@ class _EditCustomerFormState extends State<EditCustomerForm> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.name);
-    _emailController = TextEditingController(text: widget.email);
-    _phoneController = TextEditingController(text: widget.mobileNumber);
-    _addressController = TextEditingController(text: widget.address);
-
-
+    _nameController = TextEditingController(text: widget.customer['name']);
+    _emailController = TextEditingController(text: widget.customer['email']);
+    _phoneController =
+        TextEditingController(text: widget.customer['mobileNumber']);
+    _addressController =
+        TextEditingController(text: widget.customer['address']);
   }
 
   @override
@@ -43,7 +34,6 @@ class _EditCustomerFormState extends State<EditCustomerForm> {
     _addressController.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +74,6 @@ class _EditCustomerFormState extends State<EditCustomerForm> {
                 labelText: 'Address',
                 border: OutlineInputBorder(),
               ),
-              enabled: false,
             ),
             SizedBox(height: 12),
             ElevatedButton(

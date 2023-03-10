@@ -345,33 +345,35 @@ void _editname(dynamic customer) {
                 _isApiCallInProgress // display the CircularProgressIndicator widget only when the API call is being made
                     ? Center(child: CircularProgressIndicator())
                     : DataTable(
-                       dataRowHeight: 50,
-                        columnSpacing: 2,
+                       dataRowHeight: 35,
+                        columnSpacing: 5,
+                        dataTextStyle: TextStyle(fontSize: 12, color: Colors.black),
                         columns: [
                           DataColumn(
+                              
                               label: Text(
                             'Name',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purple),
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purple, fontSize: 14),
                           )),
                           DataColumn(
                               label: Text(
                             'Email',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purple),
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purple, fontSize: 14),
                           )),
                           DataColumn(
                               label: Text(
                             'Phone',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purple),
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purple, fontSize: 14),
                           )),
                           DataColumn(
                               label: Text(
                             'Address',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purple),
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purple, fontSize: 14),
                           )),
                           DataColumn(
                               label: Text(
                             'Actions',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purple),
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purple, fontSize: 14),
                           )),
                         ],
                         rows: rows,
@@ -386,7 +388,7 @@ void _editname(dynamic customer) {
               onPressed: _addname,
               child: Icon(Icons.add),
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 10),
           ],
         ),
       );
